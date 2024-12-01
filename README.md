@@ -16,22 +16,22 @@ Example build.h
 #include <cbuild/cbuild.h>
 
 void build() {
-	Target app = {
-		.type = Executable,
-		.target_name = "app",
-		.files = "src/**.c",
-		.include_dir = "include",
-	};
+    Target app = {
+	    .type = Executable,
+	    .target_name = "app",
+	    .files = "src/**.c",
+	    .include_dir = "include",
+    };
 
-	app.opts.warnings = true; // Enable warnings
+    app.opts.warnings = true; // Enable warnings
 	
-	// Handle configurations with macro defines `cbuild build --config=DEBUG`
+    // Handle configurations with macro defines `cbuild build --config=DEBUG`
 #ifdef DEBUG
-	app.opts.debug = true; // Enable debug flag
+    app.opts.debug = true; // Enable debug flag
 #elif RELEASE
-	app.opts.optimization = Optimize; // Enable optimizations
+    app.opts.optimization = Optimize; // Enable optimizations
 #endif
 
-	compile_target(app);
+    compile_target(app);
 }
 ```
