@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "build.h"
+#include "util.h"
+#include "cli.h"
 
 static void print_usage() {
     printf("cbuild: no command specified (e.g. 'cbuild build'). 'cbuild help' for commands.\n");
@@ -10,6 +12,7 @@ static void print_usage() {
 
 static void unknown_command(char *command) {
     printf("cbuild: unknown command '%s'. 'cbuild help' for commands.\n", command);
+    exit(EXIT_FAILURE);
 }
 
 static void unrecognized_argument(const char *command, int argc, char **argv) {
@@ -23,6 +26,7 @@ static void unrecognized_argument(const char *command, int argc, char **argv) {
     }
 
     printf("': unrecognized arguments. 'cbuild help %s' for help.\n", command);
+    exit(EXIT_FAILURE);
 }
 
 static void help_command(int argc, char **argv) {
@@ -71,15 +75,57 @@ static void help_command(int argc, char **argv) {
     printf("': unknown help command. Run 'cbuild help'.\n");
 }
 
+// Extend with a settings struct if args get more complicated.
 static void build_command(int argc, char **argv) {
-    if (argc == 0) {
-        cbuild_launch_buildstrap();
-    } else if (argc == 1) {
-        cbuild_launch_buildstrap();
-        // cbuild_verify_config_args();
-    } else {
-        unrecognized_argument("build", argc, &argv[1]);
+    BuildOpts build_opts;
+    
+    for (int i = 1; i < argc + 1; i++) {
+        if (argv[i][0] != '-') {
+            continue;
+        }
+
+        // double flag
+        if (argv[i][1] == '-') {
+            switch (argv[i][2])
+            {
+            case 'v':
+                if (strcmp(argv[i], "--verbose") == 0)
+                    build_opts.verbose = true;
+                else 
+                    goto build_unrecognized;
+                break;
+            
+            case 'c':
+                if (strncmp(argv[i], "--config=", 9) == 0) {
+                    build_opts.config = &argv[i][9];
+                } else {
+                    goto build_unrecognized;
+                }
+                break;
+            default:
+            build_unrecognized:
+                unrecognized_argument("build", argc, &argv[1]);
+                break;
+            }            
+        } else {
+            switch (argv[i][1]) 
+            {
+            case 'v':
+                if (strcmp(argv[i], "-v") == 0) 
+                    build_opts.verbose = true;
+                else
+                    goto build_unrecognized;
+                break;
+            
+            default:
+                unrecognized_argument("build", argc, &argv[1]);
+                break;
+            }
+        }
     }
+    
+    cbuild_build_buildstrap(build_opts);
+    // TODO: verify configs?
 }
 
 static void run_command(int argc, char **argv) {
@@ -89,7 +135,7 @@ static void run_command(int argc, char **argv) {
 int main(int argc, char **argv) {
     if (argc < 2) {
         print_usage();
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     char *command = argv[1];

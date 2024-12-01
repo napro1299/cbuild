@@ -1,43 +1,37 @@
 #include <cbuild/cbuild.h>
 
-void build(BuildArgs args) {
-    set_compiler(GCC);
-
-    set_configurations("debug release");
+void build() {
+    // set_compiler(GCC);
 
     Target cbuild = { 
         .type = Executable,
         .target_name = "cbuild",
-        .files = "src/**.c src/**.h",
-        .configuration = "debug", // Default configuration
+        .files = "cbuild/**.c",
+        .include_dir = "cbuild"
     };
 
     Target add_lib = {
         .type = StaticLibrary,
         .target_name = "add",
         .files = "func.c",
-        .configuration = "debug",
     };
-
-    int config = get_config(args);
 
     add_lib.opts.warnings = true;
     cbuild.opts.warnings = true;
 
-    // Handle configs
-    if (is_config(config, "debug")) {
-        cbuild.opts.debug = true;
-        add_lib.opts.debug = true;
-    } else if (is_config(config, "release")) {
-        cbuild.opts.optimization = Optimize;
-        add_lib.opts.optimization = Optimize;
-    }
+// Configuration handling
+#ifdef DEBUG
+    printf("Compiling for DEBUG...\n");
+    cbuild.opts.debug = true;
+    add_lib.opts.debug = true;
+#elif RELEASE
+    printf("Compiling for RELEASE...\n");
+    cbuild.opts.optimization = Optimize;
+    add_lib.opts.optimization = Optimize;
+#endif
 
     compile_target(cbuild);
-    compile_target(add_lib);
+    // compile_target(add_lib);
 
-    link(cbuild, add_lib);
-
-    
-
+    // link(cbuild, add_lib);
 }

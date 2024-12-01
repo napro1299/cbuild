@@ -38,21 +38,6 @@ typedef enum {
 } TargetType;
 
 typedef struct {
-    TargetType type;
-    const char *target_name;
-    const char *target_dir;
-
-    /* Sources */
-    const char *files;
-
-    const char *defines;
-
-    const char *configuration;
-
-    CompileOpts opts;
-} Target;
-
-typedef struct {
     bool debug;
     bool warnings;
     CStd cstd;
@@ -64,6 +49,20 @@ typedef struct {
 } CompileOpts;
 
 typedef struct {
+    TargetType type;
+    const char *target_name;
+    const char *target_dir;
+
+    /* Sources */
+    const char *files;
+    const char *include_dir;
+
+    const char *defines;
+
+    CompileOpts opts;
+} Target;
+
+typedef struct {
     const char *config;
 } BuildArgs;
 
@@ -71,13 +70,10 @@ void set_compiler(CompilerType compiler_type);
 
 void set_linker(LinkerType linker_type);
 
-void set_configurations(const char *configs);
-
 int get_config(BuildArgs args);
 
 bool is_config(int current_config, const char *test_config);
 
-// Executable add_executable(SourcesInfo sources, ExecutableOptions executable_opts);
-
+void compile_target(Target target);
 
 #endif

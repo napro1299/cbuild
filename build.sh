@@ -1,0 +1,1 @@
+gcc cbuild/build.c cbuild/cli.c cbuild/util.c cbuild/str.c cbuild/str-list.c -g -fanalyzer -Wall
