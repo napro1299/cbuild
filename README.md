@@ -17,10 +17,10 @@ Example build.h
 
 void build() {
     Target app = {
-	    .type = Executable,
-	    .target_name = "app",
-	    .files = "src/**.c",
-	    .include_dir = "include",
+        .type = Executable,
+        .target_name = "app",
+        .files = "src/**.c",
+        .include_dir = "include",
     };
 
     app.opts.warnings = true; // Enable warnings
